@@ -1,0 +1,5 @@
+numpy>=1.21.0
+tqdm>=4.64.0
+mwparserfromhell>=0.6.4
+requests>=2.28.0
+beautifulsoup4>=4.14.2
