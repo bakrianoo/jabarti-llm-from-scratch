@@ -11,7 +11,7 @@ import os
 from tqdm import tqdm
 
 class WikiCrawler:
-    def __init__(self, output_file='articles-urls.jsonl', max_workers=3, delay=0.5):
+    def __init__(self, output_file='./data/articles-urls.jsonl', max_workers=3, delay=0.5):
         self.output_file = output_file
         self.max_workers = max_workers
         self.delay = delay
@@ -227,7 +227,7 @@ class WikiCrawler:
 if __name__ == "__main__":
     start_url = "https://ar.wikipedia.org/wiki/تصنيف:تاريخ_مصر_حسب_الحقبة"
     
-    crawler = WikiCrawler(output_file='articles-urls.jsonl', max_workers=3, delay=0.5)
+    crawler = WikiCrawler(output_file='./data/articles-urls.jsonl', max_workers=3, delay=0.5)
     print("Starting crawl...")
     crawler.crawl(start_url)
     

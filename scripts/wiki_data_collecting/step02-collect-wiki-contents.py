@@ -279,7 +279,7 @@ if __name__ == "__main__":
                 print(f"✗ Failed to extract or already exists")
     else:
         # Process all articles from file
-        input_file = 'articles-urls.jsonl'
+        input_file = './data/articles-urls.jsonl'
         
         articles_dict = {}
         total_loaded = 0
