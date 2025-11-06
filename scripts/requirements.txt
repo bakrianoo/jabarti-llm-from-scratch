@@ -6,3 +6,5 @@ beautifulsoup4==4.14.2
 openai==2.7.1
 python-dotenv==1.2.1
 json-repair==0.52.4
+datasets==4.4.1
+transformers==4.57.1
