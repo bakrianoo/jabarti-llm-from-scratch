@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jabarti-llm"
+version = "0.1.0"
+description = "A bilingual (Arabic + English) GPT, built from scratch"
+
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0",
+    "tokenizers>=0.15",
+    "pandas>=2.0",
+    "pyarrow>=14.0",
+    "tqdm>=4.66",
+    "datasets>=5.0.1",
+    "huggingface-hub>=1.27.0",
+    "trackio>=0.34.0",
+    "pytest>=7.0",
+    "pyarrow>=25.0.1",
+    "fastparquet>=2026.5.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["jabarti_llm*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+
