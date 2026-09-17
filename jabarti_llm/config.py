@@ -12,6 +12,7 @@ class ModelConfig:
     dropout: float = 0.1
 
     n_heads: int = 12
+    qkv_bias: bool = False
 
 
     @property
