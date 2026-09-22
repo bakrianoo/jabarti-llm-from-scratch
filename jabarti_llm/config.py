@@ -4,6 +4,7 @@ config.py -- the single source of truth for every model dimension
 
 from dataclasses import dataclass
 
+
 @dataclass
 class ModelConfig:
     vocab_size: int = 32_000    
@@ -15,10 +16,26 @@ class ModelConfig:
 
     n_heads: int = 12
     qkv_bias: bool = False
+    pad_id: int = 0
+
+    tie_weights: bool = True
 
 
     @property
     def d_k(self):
         """The width of one head's Query, Key and Value vectors."""
         return self.d_model // self.n_heads
+
+    @classmethod
+    def jabarti(cls):
+        return cls(
+            d_model=512, n_heads=8, n_layers=8
+        )
+
+    @classmethod
+    def tiny(cls):
+        return cls(
+            d_model=128, n_heads=4, n_layers=2, max_seq_len=256
+        )
+    
 
