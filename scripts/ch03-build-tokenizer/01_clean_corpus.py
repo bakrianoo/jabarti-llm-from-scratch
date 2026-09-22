@@ -10,14 +10,16 @@ Step 2 — Type A text cleaning (cleaning.py)
 
 from pathlib import Path
 
-from huggingface_hub import hf_hub_download
 import pandas as pd
-
-from cleaning import (clean_dataframe, 
-                      normalize_text, 
-                      prepare_document)
+from cleaning import clean_dataframe, normalize_text, prepare_document
+from huggingface_hub import hf_hub_download
 
 REPO = "bakrianoo/jabarti-llm-dataset"
+
+# Pinned to the revision that still ships the four phase-split pretrain files
+# (phase1_train / phase1_eval / phase2_train / phase2_eval).
+REVISION = "2cad63ab88e5fc224397acf599edfd786bc2bb94"
+
 MAX_CHUNKS = 20
 
 HF_FILES = {
@@ -64,7 +66,8 @@ def download_and_filter():
         local = hf_hub_download(
             repo_id=REPO,
             repo_type="dataset",
-            filename=filename
+            filename=filename,
+            revision=REVISION
         )
 
         df = pd.read_parquet(local)
