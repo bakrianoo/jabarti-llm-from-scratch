@@ -3,6 +3,7 @@ tokenizer.py -- loads the bilingual BPE tokenizer trained in ch03
 """
 
 from pathlib import Path
+
 from tokenizers import Tokenizer as BackingTokenizer
 
 DEFAULT_TOKENIZER_PATH = Path(__file__).parent / "assets" / "tokenizer.json"
@@ -46,7 +47,17 @@ class Tokenizer:
 
     def encode(self, text: str, add_special_tokens: bool = False) -> list[int]:
         return self._tokenizer.encode(text, add_special_tokens=add_special_tokens).ids
-        
+
+    def encode_batch(self, texts: list[str], add_special_tokens: bool = False) -> list[list[int]]:
+        encodings = self._tokenizer.encode_batch(
+            texts, add_special_tokens=add_special_tokens
+        )
+
+        return [
+            encoding.ids
+            for encoding in encodings
+        ]
+    
     def tokenize(self, text: str, add_special_tokens: bool = False) -> list[str]:
         return self._tokenizer.encode(text, add_special_tokens=add_special_tokens).tokens
 

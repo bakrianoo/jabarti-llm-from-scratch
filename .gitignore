@@ -3,6 +3,8 @@ __pycache__/
 *.py[codz]
 *$py.class
 *.parquet
+*.bin
+meta.json
 settings.json
 
 

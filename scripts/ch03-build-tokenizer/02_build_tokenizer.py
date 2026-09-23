@@ -3,12 +3,14 @@
 ==========================================================
 """
 
+import sys
 from pathlib import Path
 
 import pandas as pd
+from cleaning import build_normalizer
 from tokenizers import Tokenizer, decoders, models, pre_tokenizers, trainers
 
-from cleaning import build_normalizer
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # ============================================================
 # CONFIGURATION
@@ -16,8 +18,7 @@ from cleaning import build_normalizer
 
 CURRENT_WD = Path(__file__).parent
 CLEAN_PATHS = [
-    CURRENT_WD / "output" / "phase1_train_clean.parquet",
-    CURRENT_WD / "output" / "phase2_train_clean.parquet",
+    CURRENT_WD / "output" / "tokenizer_corpus.parquet",
 ]
 
 OUTPUT_PATH = CURRENT_WD / "tokenizer.json"

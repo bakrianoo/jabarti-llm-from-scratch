@@ -2,41 +2,89 @@
 01 — Download, Filter, and Clean the Corpus
 ============================================
 
-Step 1 — Download & filter
-
-Step 2 — Type A text cleaning (cleaning.py)
+Step 1 — download every pretrain shard from HuggingFace (~5 GB, cached).
+Step 2 — measure whether Type-A cleaning still earns its place.
+Step 3 — demo the Type-B normalizer (unchanged, still the golden rule).
+Step 4 — write a SAMPLED corpus for the tokenizer to train on.
 
 """
 
+import argparse
+import sys
 from pathlib import Path
 
 import pandas as pd
 from cleaning import clean_dataframe, normalize_text, prepare_document
-from huggingface_hub import hf_hub_download
+from huggingface_hub import hf_hub_download, snapshot_download
 
 REPO = "bakrianoo/jabarti-llm-dataset"
 
-# Pinned to the revision that still ships the four phase-split pretrain files
-# (phase1_train / phase1_eval / phase2_train / phase2_eval).
-REVISION = "2cad63ab88e5fc224397acf599edfd786bc2bb94"
+TRAIN_GLOB = "train-*.parquet"
+EVAL_GLOB = "eval-*.parquet"
+
+KEEP_COLUMNS = ["text", "language", "article_id"]
+
+DEFAULT_TOKENIZER_DOCS = 400_000
 
 MAX_CHUNKS = 20
 
-HF_FILES = {
-    "phase1_train": "pretrain/phase1_train-00000-of-00001.parquet",
-    "phase1_eval":  "pretrain/phase1_eval-00000-of-00001.parquet",
-
-    "phase2_train": "pretrain/phase2_train-00000-of-00001.parquet",
-    "phase2_eval":  "pretrain/phase2_eval-00000-of-00001.parquet",
-
-    "ft_train":     "finetune/train-00000-of-00001.parquet",
-    "ft_eval":      "finetune/eval-00000-of-00001.parquet",
+FINETUNE_FILES = {
+    "ft_train": "finetune/train-00000-of-00001.parquet",
+    "ft_eval":  "finetune/eval-00000-of-00001.parquet",
 }
 
 TRAIN_SPLITS = {"phase1_train", "phase2_train"}
 EVAL_SPLITS = {"phase1_eval", "phase2_eval"}
 
 OUT_DIR = Path(__file__).parent / "output"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+TOKENIZER_CORPUS = OUT_DIR / "tokenizer_corpus.parquet"
+
+def shard_patterns(max_shards: int=None):
+    if max_shards is None:
+        return ["pretrain/train-*.parquet", "pretrain/eval-*.parquet"]
+
+    train_pattern = [ f"pretrain/train-{i:05d}-of-*.parquet" for i in range(max_shards) ]
+    eval_pattern = ["pretrain/eval-*.parquet"]
+
+    return train_pattern + eval_pattern
+
+def download_pretrain(max_shards: int=None):
+    """Download the pretrain shards we need, and return where they landed."""
+    print("STEP 1: DOWNLOAD THE PRETRAIN SHARDS")
+
+    patterns = shard_patterns(max_shards) + ["finetune/*.parquet"]
+    root = snapshot_download(
+        repo_id=REPO, repo_type="dataset", allow_patterns=patterns,
+    )
+
+    pretrain_folder = Path(root) / "pretrain"
+    pretrain_train_shards = sorted(pretrain_folder.glob(TRAIN_GLOB))
+    pretrain_eval_shards = sorted(pretrain_folder.glob(EVAL_GLOB))
+
+    return Path(root), pretrain_train_shards, pretrain_eval_shards
+
+def build_tokenizer_corpus(train_shards, target_docs : int):
+    """Sample evenly across shards and write the tokenizer's training text."""
+    parts = []
+    for i, shard in enumerate(train_shards):
+        parts.append(pd.read_parquet(shard, columns=KEEP_COLUMNS))
+
+    corpus = pd.concat(parts, ignore_index=True)
+    corpus = corpus.iloc[: target_docs]
+
+    corpus = clean_dataframe(corpus)
+
+    corpus.to_parquet(TOKENIZER_CORPUS, index=False)
+    return corpus
+
+def write_finetune_splits(root):
+    # download finetune splits
+    for name, filename in FINETUNE_FILES.items():
+        frame = pd.read_parquet(root / filename)
+        out = OUT_DIR / f"{name}_filtered.parquet"
+        frame.to_parquet(out, index=False)
 
 def demo_normalizer():
     print("TYPE B NORMALIZER (embeddable, runs at inference too)")
@@ -52,8 +100,6 @@ def demo_normalizer():
         print(f"  normalized: {normalize_text(s)}")
         print("="*30)
 
-    
-
 def download_and_filter():
     """Download raw HF splits, apply hard cap to train splits, write *_filtered.parquet."""
 
@@ -67,7 +113,6 @@ def download_and_filter():
             repo_id=REPO,
             repo_type="dataset",
             filename=filename,
-            revision=REVISION
         )
 
         df = pd.read_parquet(local)
@@ -107,23 +152,24 @@ def clean_phase(phase, input_path, output_path):
 
 def main():
 
-    demo_normalizer()
-    
-    download_and_filter()
+    parser = argparse.ArgumentParser(description=__doc__)
 
-    for name in TRAIN_SPLITS:
-        input_path = OUT_DIR / f"{name}_filtered.parquet"
-        output_path = OUT_DIR / f"{name}_clean.parquet"
+    parser.add_argument("--max-shards",  type=int, default=None,
+                        help="use only the first N train shards (classroom runs)")
 
-        clean_phase(phase=name, input_path=input_path, output_path=output_path)
+    parser.add_argument("--tokenizer-docs", type=int, default=DEFAULT_TOKENIZER_DOCS,
+                        help="documents to sample for tokenizer training")
 
-    for name in EVAL_SPLITS:
-        input_path = OUT_DIR / f"{name}_filtered.parquet"
-        output_path = OUT_DIR / f"{name}_clean.parquet"
+    args = parser.parse_args()
 
-        clean_phase(phase=name, input_path=input_path, output_path=output_path)
+    root, pretrain_train_shards, pretrain_eval_shards = download_pretrain(args.max_shards)
+    write_finetune_splits(root)
+
+    if args.max_shards:
+        pretrain_train_shards = pretrain_train_shards[: args.max_shards]
+
+    _ = build_tokenizer_corpus(pretrain_train_shards, target_docs=args.tokenizer_docs)
 
 if __name__ == "__main__":
     main()
     
-
