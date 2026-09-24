@@ -120,6 +120,12 @@ def main():
                         help="directory holding train.bin and eval.bin")
     parser.add_argument("--no-tracking", action="store_true")
 
+    parser.add_argument("--checkpoint-dir", type=str, default=None,
+                        help="where step and final checkpoints are written "
+                             "(default: checkpoints)")
+    parser.add_argument("--save-every", type=int, default=None,
+                        help="save a checkpoint every N steps (0 disables)")
+
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu",
                         help="device to train on (default: cuda if available)")
 
@@ -140,6 +146,8 @@ def main():
         ("print_every", args.print_every),
         ("sample_every", args.sample_every),
         ("sample_max_new_tokens", args.sample_tokens),
+        ("checkpoint_dir", args.checkpoint_dir),
+        ("save_every", args.save_every),
     ):
         if value is not None:
             setattr(training_config, name, value)
