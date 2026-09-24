@@ -38,10 +38,10 @@ python run_pretrain.py --steps 60 --warmup 10 --limit 20000 --eval-limit 2000 \
 ```bash
 python run_pretrain.py --epochs 1 \
   --batch-size 48 --accumulation-steps 4 \
-  --lr 6e-4 --warmup 500 --weight-decay 0.1 \
+  --lr 6e-4 --warmup 500 --weight-decay 0.1 --eval-every 100 \
   --print-every 100 --sample-every 100 --shuffle-seed 42 \
   --checkpoint-dir /workspace/checkpoints/jabarti-512x8 \
-  --save-every 1000
+  --save-every 700
 ```
 
 ## TrackIO Panel 

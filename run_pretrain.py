@@ -102,6 +102,9 @@ def main():
     parser.add_argument("--eval-limit", type=int, default=None,
                         help="evaluate on only the first N windows")
 
+    parser.add_argument("--eval-every", type=int, default=None,
+                        help="evaluate every N steps")
+
     parser.add_argument("--print-every", type=int, default=None,
                         help="print the loss line to the terminal every N steps "
                              "(tracker logging still follows --log-every)")
@@ -148,6 +151,7 @@ def main():
         ("sample_max_new_tokens", args.sample_tokens),
         ("checkpoint_dir", args.checkpoint_dir),
         ("save_every", args.save_every),
+        ("eval_every", args.eval_every),
     ):
         if value is not None:
             setattr(training_config, name, value)
