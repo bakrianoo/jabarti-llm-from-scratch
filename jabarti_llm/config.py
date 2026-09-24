@@ -38,4 +38,25 @@ class ModelConfig:
             d_model=128, n_heads=4, n_layers=2, max_seq_len=256
         )
     
+@dataclass
+class GenerationConfig:
+    """How to turn logits into text.
 
+    Sampling is where a model stops being deterministic. Every field here
+    trades coherence against variety, and there is no universally right
+    setting -- ch11 exists to give a feel for the trade.
+    """
+
+    max_new_tokens: int = 100
+    temperature: float = 0.8
+
+    top_k: int | None = 50     
+    top_p: float | None = 0.95   
+                                  
+    use_cache: bool = True      
+    seed: int | None = None      
+
+    @classmethod
+    def greedy(cls):
+        """Always take the likeliest token. Deterministic, and repetitive."""
+        return cls(temperature=0.0, top_k=None, top_p=None)
