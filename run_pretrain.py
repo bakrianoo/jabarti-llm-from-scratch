@@ -36,7 +36,7 @@ PACKED_DIR = Path("scripts/ch03-build-tokenizer/output")
 def _make_loader(dataset, training_config, model_config,
                   use_shuffle: bool=True, shuffle_seed: int=42):
     if use_shuffle:
-        shuffle_seed = shuffle_seed if shuffle_seed else 42
+        shuffle_seed = shuffle_seed if shuffle_seed is not None else 42
         generator = torch.Generator().manual_seed(shuffle_seed)
 
     return DataLoader(

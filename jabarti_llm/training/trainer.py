@@ -291,10 +291,11 @@ class Trainer:
             rows.append(row)
             tqdm.write(log_line)
 
-        self.tracker.log_table(
-            "samples",
-            columns=columns, rows=rows, step=self.step
-        )
+        if self.tracker is not None:
+            self.tracker.log_table(
+                "samples",
+                columns=columns, rows=rows, step=self.step
+            )
 
         self.model.train()
 

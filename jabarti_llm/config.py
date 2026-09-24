@@ -12,7 +12,7 @@ from datetime import datetime
 class ModelConfig:
     vocab_size: int = 32_000    
     d_model: int = 768          # Embedding Dim width
-    d_ff: int = 3072            # defaults to 4 * d_model, GPT-2's ratio
+    d_ff: int | None = None     # defaults to 4 * d_model, GPT-2's ratio
     max_seq_len: int = 1024
     dropout: float = 0.1
     n_layers: int = 12          # how many Transformer blocks to stack
@@ -22,6 +22,15 @@ class ModelConfig:
     pad_id: int = 0
 
     tie_weights: bool = True
+
+    def __post_init__(self):
+        if self.d_ff is None:
+            self.d_ff = 4 * self.d_model
+        
+        if self.d_model % self.n_heads != 0:
+            raise ValueError(
+                f"d_model={self.d_model} is not divisible by n_heads={self.n_heads}"
+            )
 
 
     @property
@@ -87,6 +96,7 @@ class TrainingConfig:
     min_lr_ratio: float = 0.1
 
     batch_size: int = 24
+    accumulation_steps: int = 1
 
     log_every: int = 10          
     print_every: int = 0          
@@ -123,4 +133,4 @@ def unique_run_name(base: str) -> str:
 def steps_for_epochs(num_examples, batch_size, accumulation_steps, epochs):
     effective_batch = batch_size * accumulation_steps
     steps_per_epoch = math.ceil(num_examples / effective_batch)
-    return max(1, epochs * steps_per_epoch)
+    return max(1, math.ceil(epochs * steps_per_epoch) )
