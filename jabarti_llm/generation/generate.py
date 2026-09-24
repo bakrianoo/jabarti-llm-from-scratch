@@ -37,12 +37,14 @@ def generate_ids(model, prompt_ids, config, eos_id=None, device=None):
             break
 
         logits, loss, updated_caches = model(
-            next_input, kv_caches=kv_caches, use_cache=config.use_cache
+            next_input, kv_cache=kv_caches, use_cache=config.use_cache
         )
 
         kv_caches = updated_caches
 
-        next_id = sample(logits, config, generator=generator)
+        # (1, T, vocab) -> (vocab,): only the last position predicts the next token
+        next_id = sample(logits[0, -1], config, generator=generator)
+
         ids = torch.cat([ids, torch.tensor([[next_id]], device=device)], dim=1)
 
         if eos_id is not None and next_id == eos_id:

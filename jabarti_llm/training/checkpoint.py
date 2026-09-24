@@ -19,7 +19,7 @@ def save_checkpoint(path, model, optimizer=None, scheduler=None, step=0, metrics
 
     payload = {
         "model": model.state_dict(),
-        "model_config": asdict(model.config()),
+        "model_config": asdict(model.config),
         "step": step,
         "metrics": metrics or {},
     }

@@ -41,7 +41,8 @@ class ModelConfig:
     @classmethod
     def jabarti(cls):
         return cls(
-            d_model=512, n_heads=8, n_layers=8
+            d_model=512, n_heads=8, n_layers=8,
+            dropout=0.05
         )
 
     @classmethod
