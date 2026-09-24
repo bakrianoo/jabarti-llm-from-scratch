@@ -21,7 +21,7 @@ class Tokenizer:
     USER = 8
     ASST = 9
 
-    _SPECIAL_TOKENS = {
+    _SPECIAL_TOKENS = {  # noqa: RUF012
         "[PAD]": PAD, "[UNK]": UNK, "[BOS]": BOS, "[EOS]": EOS, "[SEP]": SEP,
         "[AR]": AR, "[EN]": EN, "[SYS]": SYS, "[USER]": USER, "[ASST]": ASST,
     }

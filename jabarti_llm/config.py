@@ -2,7 +2,10 @@
 config.py -- the single source of truth for every model dimension
 """
 
+import math
+import random
 from dataclasses import dataclass
+from datetime import datetime
 
 
 @dataclass
@@ -113,3 +116,11 @@ class TrainingConfig:
         "The scientific study found that",           # science
     )
 
+def unique_run_name(base: str) -> str:
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    return f"run-{random.randint(0, 9999):04d}-{base}-{stamp}"
+
+def steps_for_epochs(num_examples, batch_size, accumulation_steps, epochs):
+    effective_batch = batch_size * accumulation_steps
+    steps_per_epoch = math.ceil(num_examples / effective_batch)
+    return max(1, epochs * steps_per_epoch)
