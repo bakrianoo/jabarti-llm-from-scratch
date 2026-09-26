@@ -20,6 +20,9 @@ from jabarti_llm.model import (
     TransformerBlock,
     apply_lora,
     merge_lora,
+    merge_token_rows,
+    train_token_rows,
+    TrainableRowsEmbedding,
 )
 from jabarti_llm.tokenizer import Tokenizer
 from jabarti_llm.training import (
@@ -61,6 +64,9 @@ __all__ = [
     "model_config_from_checkpoint",
     "save_checkpoint",
     "unfreeze_tail",
+    "merge_token_rows",
+    "train_token_rows",
+    "TrainableRowsEmbedding",
 
 
 ]

@@ -67,12 +67,12 @@ python run_finetune_lora.py --resume ../checkpoints/jabarti-512x8-ep15/pretrain_
 
 ```bash
 python run_finetune_lora.py \
-  --resume ../checkpoints/jabarti-512x8-ep15/jabarti-512x8/pretrain_final.pt \
-  --epochs 30 --batch-size 56 --accumulation-steps 4 \
-  --lr 2e-4 --warmup 100 --lora-r 16 --lora-alpha 32 \
-  --print-every 50 --sample-every 100 --shuffle-seed 42 \
+  --resume ../checkpoints/jabarti-512x8-ep15/pretrain_final.pt \
+  --epochs 100 --batch-size 56 --accumulation-steps 4 \
+  --lr 6e-4 --warmup 100 --lora-r 1024 --lora-alpha 2048 \
+  --print-every 100 --sample-every 500 --shuffle-seed 42 --shuffle \
   --checkpoint-dir /workspace/checkpoints/jabarti-512x8-lora \
-  --save-every 500
+  --save-every 2000
 ```
 
 - `--lora-r` — rank of the LoRA detour (higher = more capacity, more trainable params).

@@ -79,11 +79,10 @@ class ChatDataset(Dataset):
             if language is None:
                 language = "en"
 
-            if system is None:
-                system = DEFAULT_SYSTEM.get(language or "en")
+            row_system = system if system is not None else DEFAULT_SYSTEM[language]
 
             inputs, labels = format_chat(
-                tokenizer=tokenizer, question=question, answer=answer, system=system
+                tokenizer=tokenizer, question=question, answer=answer, system=row_system
             )
 
             if len(inputs) > config.max_seq_len:
