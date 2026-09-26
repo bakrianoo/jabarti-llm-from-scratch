@@ -283,6 +283,7 @@ class Trainer:
             response = generate(
                 self.model, self.tokenizer, prompt, self.sample_config,
                 device=self.device,
+                chat=self.config.sample_chat
             )
 
             row = [self.step, prompt, response]

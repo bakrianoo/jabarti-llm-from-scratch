@@ -14,6 +14,17 @@ DEFAULT_SYSTEM = {
     "en": "You are a helpful assistant answering questions about Egypt.",
 }
 
+# Every character has a number (its Unicode code point); ord("م") == 0x0645.
+# Arabic letters all live in one block of numbers: 0x0600 to 0x06FF.
+ARABIC_LETTERS = range(0x0600, 0x0700)
+
+def system_for(text):
+    for char in text:
+        if ord(char) in ARABIC_LETTERS:
+            return DEFAULT_SYSTEM["ar"]
+
+    return DEFAULT_SYSTEM["en"]
+
 def format_chat(tokenizer, question, answer=None, system=None):
 
     """Build one conversation, and say which tokens the model is graded on.

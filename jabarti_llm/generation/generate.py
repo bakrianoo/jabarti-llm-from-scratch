@@ -9,6 +9,7 @@ wastes almost all of the work, which is what the KV cache fixes.
 import torch
 
 from jabarti_llm.generation.sampling import sample
+from jabarti_llm.data.chat import format_chat, system_for
 
 
 @torch.no_grad()
@@ -61,15 +62,21 @@ def generate_ids(model, prompt_ids, config, eos_id=None, device=None):
     # ids[0].tolist()   →   [2, 11, 12, 13, 99]    flat: one sequence of ints
 
 
-def generate(model, tokenizer, prompt, config, device=None):
+def generate(model, tokenizer, prompt, config, device=None, chat: bool=False):
     """Continue a prompt, returning only the newly generated text.
 
     The prompt is prefixed with [BOS] because training wrapped every document
     that way (ch08); a model given a bare first token is being asked to
     continue from a state it never saw.
+
+    chat=True treats the prompt as a question and wraps it in the same
+    [SYS] ... [USER] ... [ASST] template finetuning used, for the same reason.
     """
 
-    prompt_ids = [tokenizer.BOS] + tokenizer.encode(prompt)
+    if not chat:
+        prompt_ids = [tokenizer.BOS] + tokenizer.encode(prompt)
+    else:
+        prompt_ids, _ = format_chat(tokenizer, prompt, system=system_for(prompt))
 
     produced_ids = generate_ids(
         model, prompt_ids, config, eos_id=tokenizer.EOS, device=device

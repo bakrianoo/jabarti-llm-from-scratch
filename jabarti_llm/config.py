@@ -113,6 +113,7 @@ class TrainingConfig:
     seed: int = 0
 
     sample_every: int = 500
+    sample_chat: bool = False # wrap sample prompts in the chat template (finetuning)
     sample_max_new_tokens: int = 60
     sample_prompts: tuple[str, ...] = (
         "وُلد في مدينة بغداد عام",              # biography

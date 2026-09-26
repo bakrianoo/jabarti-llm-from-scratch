@@ -184,6 +184,7 @@ def main():
             setattr(training_config, name, value)
 
     training_config.sample_prompts = FT_SAMPLE_PROMPTS
+    training_config.sample_chat = True
 
     print("loading tokenizer")
     tokenizer = Tokenizer.from_file()
