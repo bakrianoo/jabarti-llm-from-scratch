@@ -59,7 +59,7 @@ into the model at the end and saved as `finetune_chat_lora_final.pt` inside
 ```bash
 python run_finetune_lora.py --resume ../checkpoints/jabarti-512x8-ep15/pretrain_final.pt \
   --steps 60 --warmup 10 --limit 2000 \
-  --batch-size 8 --lr 2e-4 --lora-r 8 --lora-alpha 16 \
+  --batch-size 8 --lr 2e-5 --lora-r 8 --lora-alpha 16 \
   --print-every 10 --sample-every 30 --shuffle-seed 42
 ```
 
@@ -69,7 +69,7 @@ python run_finetune_lora.py --resume ../checkpoints/jabarti-512x8-ep15/pretrain_
 python run_finetune_lora.py \
   --resume ../checkpoints/jabarti-512x8-ep15/pretrain_final.pt \
   --epochs 100 --batch-size 56 --accumulation-steps 4 \
-  --lr 6e-4 --warmup 100 --lora-r 1024 --lora-alpha 2048 \
+  --lr 2e-5 --warmup 100 --lora-r 256 --lora-alpha 512 \
   --print-every 100 --sample-every 500 --shuffle-seed 42 --shuffle \
   --checkpoint-dir /workspace/checkpoints/jabarti-512x8-lora \
   --save-every 2000

@@ -24,8 +24,6 @@ from jabarti_llm import (
     chat_collate_fn,
     merge_lora,
     save_checkpoint,
-    merge_token_rows,
-    train_token_rows,
 )
 from jabarti_llm.config import steps_for_epochs, unique_run_name
 from jabarti_llm.training import load_checkpoint, model_config_from_checkpoint
@@ -152,11 +150,6 @@ def main():
                             help="where step and final checkpoints are written "
                                  "(default: checkpoints)")
 
-    parser.add_argument("--train-role-tokens", action=argparse.BooleanOptionalAction,
-                        default=True, dest="train_role_tokens",
-                        help="let the [SYS]/[USER]/[ASST] embedding rows learn; pretraining "
-                             "never saw them, so frozen they stay random (default: on)")
-
     args = parser.parse_args()
 
     if args.resume:
@@ -216,10 +209,6 @@ def main():
 
     replaced = apply_lora(model=model, r=args.lora_r, alpha=args.lora_alpha)
 
-    role_tokens = (tokenizer.SYS, tokenizer.USER, tokenizer.ASST)
-    if args.train_role_tokens:
-        train_token_rows(model, role_tokens)
-
     trainable = sum(
         p.numel() for p in model.parameters() if p.requires_grad
     )
@@ -227,10 +216,6 @@ def main():
 
     print(f"LoRA: wrapped {replaced} attention projection(s) at rank {args.lora_r} "
           f"(alpha={args.lora_alpha})")
-
-    if args.train_role_tokens:
-        print(f"  + embedding rows for {len(role_tokens)} role tokens {role_tokens}")
-
     
     print(f"  {trainable:,} trainable / {total:,} total parameters "
           f"({trainable / total:.2%})")
@@ -254,11 +239,6 @@ def main():
 
     merged = merge_lora(model)
     print(f"merged {merged} LoRA adapter(s) back into their base projections")
-
-    merged_rows = merge_token_rows(model)
-    if merged_rows:
-        print(f"merged {merged_rows} trained embedding row(s) back into the token table "
-              f"(lm_head untied to keep its original rows)")
 
     final = save_checkpoint(
         f"{training_config.checkpoint_dir}/finetune_chat_lora_final.pt",
